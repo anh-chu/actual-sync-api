@@ -1,5 +1,7 @@
 {
+  "name": "actual-sync-api",
   "type": "module",
+  "license": "MIT",
   "main": "src/app.ts",
   "scripts": {
     "start": "NODE_ENV=development ts-node src/app.ts",
