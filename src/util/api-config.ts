@@ -3,7 +3,7 @@ import ioredis from 'ioredis';
 import { createClient } from 'redis';
 import JWTR from 'jwt-redis';
 
-import finalConfig from '../load-config';
+import finalConfig from '../load-config.js';
 
 // Initialize client with redis
 export const redisClient = createClient({
@@ -31,5 +31,5 @@ export const redlock = new Redlock([
 
 export const config = {
   dataDir: finalConfig.apiFiles,
-  serverURL: 'http://localhost:' + finalConfig.port,
+  serverURL: finalConfig.actualUrl,
 };

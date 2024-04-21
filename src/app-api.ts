@@ -3,23 +3,22 @@ import express from 'express';
 import api from '@actual-app/api';
 import audit from 'express-requests-logger';
 
-import errorMiddleware from './util/error-middleware';
 import {
   generateToken,
   getCreds,
   authenticateToken,
   authenticateAndReturnToken,
-} from './util/api-jwt';
+} from './util/api-jwt.js';
 import {
   redisClient,
   credsPrefix,
   redlock,
   jwtr,
   config,
-} from './util/api-config';
+} from './util/api-config.js';
 
 const app = express();
-app.use(errorMiddleware);
+
 if (process.env.NODE_ENV === 'development') app.use(audit());
 
 export { app as handlers };
@@ -39,12 +38,13 @@ app.post('/init', async (req, res) => {
       console.log(err);
     }
   }
-  await api.init({ ...config, password: req.body.password });
+  console.log(config.serverURL);
   const creds = {
     password: req.body.password,
     budgetId: req.body.budgetId,
     budgetPassword: req.body.budgetPassword,
   };
+  await api.init({ ...config, password: creds.password });
   await api.downloadBudget(creds.budgetId, {
     password: creds.budgetPassword,
   });
@@ -159,5 +159,3 @@ app.post('/:function', authenticateToken, async (req, res, next) => {
     next(err);
   }
 });
-
-app.use(errorMiddleware);

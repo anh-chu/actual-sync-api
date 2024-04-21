@@ -40,7 +40,7 @@ userConfig = parseJSON(configFile, true);
 
 /** @type {Omit<import('./config-types.js').Config, 'mode' | 'dataDir' | 'serverFiles' | 'apiFiles' | 'userFiles'>} */
 let defaultConfig = {
-  port: 5006,
+  port: 5007,
   hostname: 'localhost',
   upload: {
     fileSizeSyncLimitMB: 20,
@@ -70,9 +70,10 @@ if (process.env.NODE_ENV === 'test') {
 
 const finalConfig = {
   ...config,
-  port: +process.env.ACTUAL_PORT! || +process.env.PORT! || config.port,
-  hostname: process.env.ACTUAL_HOSTNAME || config.hostname,
-  apiFiles: process.env.ACTUAL_API_FILES || config.apiFiles,
+  actualUrl: process.env.ACTUAL_URL,
+  port: +process.env.API_PORT! || +process.env.PORT! || config.port,
+  hostname: process.env.API_HOSTNAME || config.hostname,
+  apiFiles: process.env.API_FILES || config.apiFiles,
   redisHost: process.env.REDIS_HOST || '127.0.0.1',
   redisPort: process.env.REDIS_PORT || 6379,
   https:
@@ -103,6 +104,7 @@ const finalConfig = {
       : config.upload,
 };
 
+debug(`using Actual URL ${finalConfig.actualUrl}`);
 debug(`using port ${finalConfig.port}`);
 debug(`using hostname ${finalConfig.hostname}`);
 debug(`using server files directory ${finalConfig.serverFiles}`);

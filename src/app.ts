@@ -1,6 +1,4 @@
-import dotenv from "dotenv";
-
-dotenv.config();
+import 'dotenv/config';
 
 import fs from 'node:fs';
 import express from 'express';
@@ -11,8 +9,9 @@ import swaggerUi from 'swagger-ui-express';
 // @ts-ignore
 import swaggerFile from './swagger_output.json' assert { type: "json" };
 
-import config from './load-config';
-import * as apiApp from './app-api';
+import config from './load-config.js';
+import * as apiApp from './app-api.js';
+import errorMiddleware from './util/error-middleware.js';
 
 const app = express();
 
@@ -25,13 +24,10 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.raw({ type: 'application/actual-sync', limit: '20mb' }));
 app.use(bodyParser.raw({ type: 'application/encrypted-file', limit: '50mb' }));
+app.use(errorMiddleware);
 
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 app.use('/api', apiApp.handlers);
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerFile))
-
-// app.get('/mode', (req, res) => {
-//   res.send(config.mode);
-// });
 
 // The web frontend
 app.use((req, res, next) => {

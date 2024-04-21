@@ -1,6 +1,6 @@
-import { redisClient, credsPrefix, jwtr, expiresIn } from './api-config';
+import { redisClient, credsPrefix, jwtr, expiresIn } from './api-config.js';
 
-const secret = 'TYLFtYGx23q38V/PgX/L3Ntgj9LGP2c6nTOWpKjYmJc=';
+const secret = process.env.JWT_SECRET;
 
 export async function generateToken(payload?: any) {
   if (!payload) payload = {};
