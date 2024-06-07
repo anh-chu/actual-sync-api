@@ -1,4 +1,4 @@
-FROM node:18-bullseye as base
+FROM node:20-bullseye as base
 WORKDIR /app
 ADD yarn.lock package.json ./
 RUN yarn install --all --frozen-lockfile
@@ -7,7 +7,7 @@ ADD src .
 RUN yarn build
 RUN yarn install --production --ignore-scripts --prefer-offline --frozen-lockfile
 
-FROM node:18-bullseye-slim as prod
+FROM node:20-bullseye-slim as prod
 RUN apt-get update && apt-get install tini && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=base /app/node_modules /app/node_modules
