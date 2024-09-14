@@ -149,9 +149,14 @@ app.post('/:function', authenticateToken, async (req, res, next) => {
         if (signal.aborted) {
           next(signal.error);
         }
-        return req.query.paramsInBody
+        const r = req.query.paramsInBody
           ? await api[functionName](...body._)
           : await api[functionName](body);
+        // convert result if a number since Express doesn't support sending numbers in the response
+        if (typeof r === 'number') {
+          return {value: r}
+        }
+        return r;
       },
     );
     res.send(result);
