@@ -91,7 +91,8 @@ app.post('/query', authenticateToken, async (req, res, next) => {
         // build graphql functions. Iterate over the json body with key name being function names and key value being the function argument
         const body = req.body;
         const f = function () {
-          let a = api;
+          // Use a loose type so dynamic lookup of query builder functions type-checks
+          let a: any = api;
           for (const [key, value] of Object.entries(body)) {
             // only proceed if the function is found in @actual-app/api
             if (!a[key]) {
