@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@actual-app/api@^25.12.0":
-  version "25.12.0"
-  resolved "https://registry.yarnpkg.com/@actual-app/api/-/api-25.12.0.tgz#90ff077360a909148175364163f3c60ed3c4721a"
-  integrity sha512-W9xFQtHdEehEX7V6qKmOsaToK/Vj/Y/J11IHGKtowma5olhBF2qCCJcB6AKaHBmIZ6A3lkVd+WFkNfP5I/hREA==
+"@actual-app/api@^26.2.0":
+  version "26.2.0"
+  resolved "https://registry.yarnpkg.com/@actual-app/api/-/api-26.2.0.tgz#8b8239dab9bf5ea8e1f1a4642d69326f3840d0c0"
+  integrity sha512-Or0694ALXY950jy1A92Wrwqz2qItigsLMtKJgwl7eL16de3sDKw5yOZGEq2W561i16mQqdYTT+810N+y2QXbpA==
   dependencies:
     "@actual-app/crdt" "^2.1.0"
-    better-sqlite3 "^12.4.1"
+    better-sqlite3 "^12.5.0"
     compare-versions "^6.1.1"
     node-fetch "^3.3.2"
     uuid "^13.0.0"
@@ -182,10 +182,10 @@ base64-js@^1.3.1:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
-better-sqlite3@^12.4.1:
-  version "12.5.0"
-  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.5.0.tgz#c570873d9635b5d56baa52f7e72634c2c589f35f"
-  integrity sha512-WwCZ/5Diz7rsF29o27o0Gcc1Du+l7Zsv7SYtVPG0X3G/uUI1LqdxrQI7c9Hs2FWpqXXERjW9hp6g3/tH7DlVKg==
+better-sqlite3@^12.5.0:
+  version "12.6.2"
+  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.6.2.tgz#770649f28a62e543a360f3dfa1afe4cc944b1937"
+  integrity sha512-8VYKM3MjCa9WcaSAI3hzwhmyHVlH8tiGFwf0RlTsZPWJ1I5MkzjiudCo4KC4DxOaL/53A5B1sI/IbldNFDbsKA==
   dependencies:
     bindings "^1.5.0"
     prebuild-install "^7.1.1"
