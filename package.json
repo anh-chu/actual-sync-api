@@ -2,6 +2,9 @@
   "name": "actual-sync-api",
   "type": "module",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "main": "src/app.ts",
   "scripts": {
     "start": "NODE_ENV=development npx tsx src/app.ts",
