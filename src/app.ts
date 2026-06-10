@@ -7,7 +7,7 @@ import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 
 // @ts-ignore
-import swaggerFile from './swagger_output.json' assert { type: "json" };
+import swaggerFile from './swagger_output.json' with { type: "json" };
 
 import config from './load-config.js';
 import * as apiApp from './app-api.js';
