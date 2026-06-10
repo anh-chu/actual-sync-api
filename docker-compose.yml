@@ -29,7 +29,8 @@ services:
     build: .
     container_name: actual-api
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     ports:
       - '5007:5007'
     environment:
