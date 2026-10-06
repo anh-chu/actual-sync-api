@@ -5,6 +5,9 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  # Rebuilds are also dispatched by the auto-upgrade workflow: pushes made
+  # with GITHUB_TOKEN do not trigger push-based workflows on their own.
+  workflow_dispatch:
 
 jobs:
   build:

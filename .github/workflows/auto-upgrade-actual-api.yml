@@ -1,0 +1,121 @@
+name: Auto-upgrade @actual-app/api
+
+# Keeps @actual-app/api on the latest npm release. When a newer version is
+# published, this workflow re-resolves the yarn.lock entry, verifies the
+# frozen install and the TypeScript build, commits straight to main, and
+# then dispatches the Docker Build workflow explicitly: pushes made with
+# the default GITHUB_TOKEN do not trigger push-based workflows on their own.
+
+on:
+  schedule:
+    - cron: "17 4 * * *" # daily at 04:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write # commit the upgraded yarn.lock to main
+  actions: write # dispatch the Docker Build workflow
+
+concurrency:
+  group: auto-upgrade-actual-api
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Compare yarn.lock version with npm latest
+        id: check
+        run: |
+          set -euo pipefail
+          latest="$(npm view @actual-app/api version)"
+          current="$(node -e '
+            const fs = require("fs");
+            const lines = fs.readFileSync("yarn.lock", "utf8").split("\n");
+            let version = "";
+            for (let i = 0; i < lines.length; i++) {
+              if (/^"@actual-app\/api@[^"]*":$/.test(lines[i].trim())) {
+                const match = lines[i + 1].match(/version "?([^"\s]+)"?/);
+                if (match) version = match[1];
+              }
+            }
+            if (!version) {
+              console.error("no @actual-app/api entry found in yarn.lock");
+              process.exit(1);
+            }
+            process.stdout.write(version);
+          ')"
+          echo "yarn.lock: $current, npm latest: $latest"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          if [ "$latest" = "$current" ]; then
+            echo "Already on the latest version, nothing to do."
+            exit 0
+          fi
+          newest="$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -n 1)"
+          if [ "$newest" = "$latest" ]; then
+            echo "upgrade=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "yarn.lock ($current) is ahead of npm latest ($latest), skipping."
+          fi
+
+      - name: Upgrade @actual-app/api
+        if: steps.check.outputs.upgrade == 'true'
+        run: |
+          set -euo pipefail
+          yarn upgrade @actual-app/api --non-interactive
+          resolved="$(node -e '
+            const fs = require("fs");
+            const lines = fs.readFileSync("yarn.lock", "utf8").split("\n");
+            let version = "";
+            for (let i = 0; i < lines.length; i++) {
+              if (/^"@actual-app\/api@[^"]*":$/.test(lines[i].trim())) {
+                const match = lines[i + 1].match(/version "?([^"\s]+)"?/);
+                if (match) version = match[1];
+              }
+            }
+            if (!version) {
+              console.error("no @actual-app/api entry found in yarn.lock");
+              process.exit(1);
+            }
+            process.stdout.write(version);
+          ')"
+          if [ "$resolved" != "${{ steps.check.outputs.latest }}" ]; then
+            echo "::error::yarn.lock resolved @actual-app/api $resolved, expected ${{ steps.check.outputs.latest }}"
+            exit 1
+          fi
+          echo "yarn.lock now resolves @actual-app/api $resolved"
+
+      - name: Verify frozen lockfile install
+        if: steps.check.outputs.upgrade == 'true'
+        run: yarn install --frozen-lockfile --non-interactive
+
+      - name: Verify build
+        if: steps.check.outputs.upgrade == 'true'
+        run: yarn build
+
+      - name: Commit and push to main
+        if: steps.check.outputs.upgrade == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json yarn.lock
+          git commit -m "chore(deps): bump @actual-app/api to ${{ steps.check.outputs.latest }}"
+          git push origin HEAD:main
+
+      - name: Trigger Docker Build
+        if: steps.check.outputs.upgrade == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run docker.yml --ref main
