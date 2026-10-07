@@ -71,7 +71,10 @@ app.post('/query', authenticateToken, async (req, res, next) => {
     const creds = await getCreds(req.jti);
     const result = await redlock.using(
       [creds.budgetId],
-      5000,
+      // 120s lease: long sync/import work can outlive a short TTL while the
+      // event loop is busy (better-sqlite3 is synchronous); an expired lease
+      // makes release()/extend throw a quorum error -> bare HTML 500.
+      120000,
       async (signal) => {
         try {
           await api.downloadBudget(creds.budgetId, {
@@ -123,7 +126,10 @@ app.post('/:function', authenticateToken, async (req, res, next) => {
     const creds = await getCreds(req.jti);
     const result = await redlock.using(
       [creds.budgetId],
-      5000,
+      // 120s lease: long sync/import work can outlive a short TTL while the
+      // event loop is busy (better-sqlite3 is synchronous); an expired lease
+      // makes release()/extend throw a quorum error -> bare HTML 500.
+      120000,
       async (signal) => {
         try {
           await api.downloadBudget(creds.budgetId, {
